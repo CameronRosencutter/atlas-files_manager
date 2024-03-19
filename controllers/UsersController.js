@@ -8,7 +8,9 @@ const UsersController = {
 
     if (!email) { return response.status(400).json({ error: 'Missing email' }); }
     if (!password) { return response.status(400).json({ error: 'Missing password' }); }
-    if (await usersCollection.findOne({ email })) {
+
+    const emailExists = await usersCollection.findOne({ email });
+    if (emailExists) {
       return response.status(400).json({ error: 'Already exist' });
     }
 
