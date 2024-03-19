@@ -9,14 +9,12 @@ const AppController = {
     const redisAlive = redisClient.isAlive();
     const dbAlive = dbClient.isAlive();
 
-
     if (redisAlive && dbAlive) {
       response.status(200).json({ redis: true, db: true });
     } else {
       response.status(500).json({ error: 'Service Not Available' });
     }
   },
-
 
   getStats: async (request, response) => {
     try {
