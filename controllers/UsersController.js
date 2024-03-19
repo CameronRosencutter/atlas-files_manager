@@ -1,22 +1,31 @@
-const redisClient = require('../utils/redis');
 const dbClient = require('../utils/db');
 const crypto = require('crypto');
 
 const UsersController = {
-  postNew: async (email, password) => {
+  postNew: (email, password) => {
     const usersCollection = dbClient.client.db(dbClient.database).collection('users');
 
-    if (!email) { return Error('Missing email'), 400; }
-    if (!password) { return Error('Missing password'), 400; }
-    if (email in dbClient.client.db(dbClient.database).collection('users')) {
-      return Error('Already exist'), 400;
+    if (!email) {
+      const err = new Error('Missing email');
+      err.code = 400;
+      return err;
+    }
+    if (!password) {
+      const err = new Error('Missing password');
+      err.code = 400;
+      return err;
+    }
+    if (usersCollection.find({email: email})) {
+      const err = new Error('Already exist');
+      err.code = 400;
+      return err;
     }
 
     const user = {
       email: email,
-      password: crypto.createHash('SHA1').update(password).digest('hex')
+      password: crypto.createHash('SHA1').update(password).digest('hex'),
     };
-    return await usersCollection.insertOne(user);
+    return usersCollection.insertOne(user);
   }
 }
 
