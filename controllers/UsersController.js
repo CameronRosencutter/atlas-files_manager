@@ -1,46 +1,44 @@
 const SHA1 = require('sha1');
 const dbClient = require('../utils/db');
 
-const UsersController = {
-    // Create a new user
-    postNew: async (req, res) => {
+class UsersController {
+    static async postNew(req, res) {
       const { email, password } = req.body;
   
-      // Check if email and password are provided
+      // Check if email is missing
       if (!email) {
         return res.status(400).json({ error: 'Missing email' });
       }
   
+      // Check if password is missing
       if (!password) {
         return res.status(400).json({ error: 'Missing password' });
       }
   
       try {
-        // Check if the email already exists in the database
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-          return res.status(400).json({ error: 'Already exists' });
+        // Check if email already exists in DB
+        const userExists = await dbClient.getUserByEmail(email);
+        if (userExists) {
+          return res.status(400).json({ error: 'Already exist' });
         }
   
         // Hash the password using SHA1
-        const hashedPassword = crypto.createHash('sha1').update(password).digest('hex');
+        const hashedPassword = sha1(password);
   
-        // Create a new user object
-        const newUser = new User({
+        // Create the new user
+        const newUser = {
           email,
-          password: hashedPassword
-        });
+          password: hashedPassword,
+        };
   
-        // Save the new user to the database
-        await newUser.save();
+        // Save the new user in the collection users
+        const savedUser = await dbClient.createUser(newUser);
   
-        // Return the new user with only the email and id
-        return res.status(201).json({ email: newUser.email, id: newUser._id });
+        // Return the new user with only the email and the id
+        return res.status(201).json({ email: savedUser.email, id: savedUser._id });
       } catch (error) {
         console.error('Error creating user:', error);
         return res.status(500).json({ error: 'Internal Server Error' });
       }
     }
-  };
-
 module.exports = UsersController;
