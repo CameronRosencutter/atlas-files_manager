@@ -41,23 +41,23 @@ const createFile = async (req, res) => {
         return res.status(400).json({ message: 'Parent not found' });
     }
     if (parentFile.type !== 'folder') {
-            return res.status(400).json({ message: 'Parent is not a folder' });
-        }
+        return res.status(400).json({ message: 'Parent is not a folder' });
     }
+  }
 
-    let localPath;
-    if (type === 'file' || type === 'image') {
-        const folderPath = process.env.FOLDER_PATH || '/tmp/files_manager';
-        if (!fs.existsSync(folderPath)) {
-            fs.mkdirSync(folderPath, { recursive: true });
-        }
-        const filename = uuidv4();
-        localPath = path.join(folderPath, filename);
-        const buffer = Buffer.from(data, 'base64');
-        fs.writeFileSync(localPath, buffer);
+  let localPath;
+  if (type === 'file' || type === 'image') {
+    const folderPath = process.env.FOLDER_PATH || '/tmp/files_manager';
+    if (!fs.existsSync(folderPath)) {
+      fs.mkdirSync(folderPath, { recursive: true });
     }
+    const filename = uuidv4();
+    localPath = path.join(folderPath, filename);
+    const buffer = Buffer.from(data, 'base64');
+    fs.writeFileSync(localPath, buffer);
+  }
 
-    const newFile = new File({
+  const newFile = new File({
         userId: user._id,
         name,
         type,
