@@ -1,4 +1,4 @@
-const SHA1 = require('sha1');
+const sha1 = require('sha1');
 const redisClient = require('../utils/redis');
 const dbClient = require('../utils/db');
 
@@ -18,7 +18,7 @@ class UsersController {
 
     try {
       // Check if email already exists in DB
-      const userExists = await dbClient.getUserByEmail(email);
+      const userExists = await dbClient.users.findOne({ email });
       if (userExists) {
       return res.status(400).json({ error: 'Already exist' });
       }
