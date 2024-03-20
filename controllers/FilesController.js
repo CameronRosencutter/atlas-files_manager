@@ -7,26 +7,26 @@ const File = require('../models/File');
 
 // POST /files
 const createFile = async (req, res) => {
-    // Check for validation errors
-    const errors = validationResult(req);
+  // Check for validation errors
+  const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-    }
+    return res.status(400).json({ errors: errors.array() });
+  }
 
-    // Retrieve user based on token
-    const user = await User.findById(req.user.id);
-    if (!user) {
+  // Retrieve user based on token
+  const user = await User.findById(req.user.id);
+  if (!user) {
         return res.status(401).json({ message: 'Unauthorized' });
     }
 
     const { name, type, parentId = 0, isPublic = false, data } = req.body;
 
-    // Validate required fields
-    if (!name) {
-        return res.status(400).json({ message: 'Missing name' });
-    }
+  // Validate required fields
+  if (!name) {
+    return res.status(400).json({ message: 'Missing name' });
+  }
 
-    if (!type || !['folder', 'file', 'image'].includes(type)) {
+  if (!type || !['folder', 'file', 'image'].includes(type)) {
         return res.status(400).json({ message: 'Missing or invalid type' });
     }
 
