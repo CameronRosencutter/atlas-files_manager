@@ -6,7 +6,7 @@ const User = require('../models/User');
 const File = require('../models/File');
 
 const FilesController = {
-    getShow: async (req, res) => {
+    putPublish: async (req, res) => {
       try {
         // Retrieve the user based on the token
         const user = await User.findOne({ token: req.token });
@@ -24,15 +24,19 @@ const FilesController = {
           return res.status(404).json({ error: 'Not found' });
         }
   
-        // Return the file document
-        return res.json(file);
+        // Update isPublic to true
+        file.isPublic = true;
+        await file.save();
+  
+        // Return the updated file document
+        return res.status(200).json(file);
       } catch (error) {
         console.error(error);
         return res.status(500).json({ error: 'Internal Server Error' });
       }
     },
   
-    getIndex: async (req, res) => {
+    putUnpublish: async (req, res) => {
       try {
         // Retrieve the user based on the token
         const user = await User.findOne({ token: req.token });
@@ -42,19 +46,20 @@ const FilesController = {
           return res.status(401).json({ error: 'Unauthorized' });
         }
   
-        // Parse query parameters
-        const parentId = req.query.parentId || 0;
-        const page = parseInt(req.query.page) || 0;
-        const limit = 20;
-        const skip = page * limit;
+        // Find the file document based on the ID
+        const file = await File.findOne({ _id: req.params.id, user: user._id });
   
-        // Find all file documents for the user with pagination
-        const files = await File.find({ user: user._id, parentId: parentId })
-                                .skip(skip)
-                                .limit(limit);
+        // If file not found, return Not Found error
+        if (!file) {
+          return res.status(404).json({ error: 'Not found' });
+        }
   
-        // Return the list of file documents
-        return res.json(files);
+        // Update isPublic to false
+        file.isPublic = false;
+        await file.save();
+  
+        // Return the updated file document
+        return res.status(200).json(file);
       } catch (error) {
         console.error(error);
         return res.status(500).json({ error: 'Internal Server Error' });
