@@ -9,28 +9,28 @@ class UsersController {
     // Check if email is missing
     if (!email) {
       return res.status(400).json({ error: 'Missing email' });
+    }
+    
+    // Check if password is missing
+    if (!password) {
+      return res.status(400).json({ error: 'Missing password' });
+    }
+
+    try {
+      // Check if email already exists in DB
+      const userExists = await dbClient.getUserByEmail(email);
+      if (userExists) {
+      return res.status(400).json({ error: 'Already exist' });
       }
   
-      // Check if password is missing
-      if (!password) {
-        return res.status(400).json({ error: 'Missing password' });
-      }
-  
-      try {
-        // Check if email already exists in DB
-        const userExists = await dbClient.getUserByEmail(email);
-        if (userExists) {
-          return res.status(400).json({ error: 'Already exist' });
-        }
-  
-        // Hash the password using SHA1
-        const hashedPassword = sha1(password);
-  
-        // Create the new user
-        const newUser = {
-          email,
-          password: hashedPassword,
-        };
+      // Hash the password using SHA1
+      const hashedPassword = sha1(password);
+
+      // Create the new user
+      const newUser = {
+        email,
+        password: hashedPassword,
+      };
   
         // Save the new user in the collection users
         const savedUser = await dbClient.createUser(newUser);
