@@ -33,8 +33,7 @@ const File = require('../models/File');
   if ((type === 'file' || type === 'image') && !data) {
   return res.status(400).json({ message: 'Missing data' });
   }
-  
-  try {
+
   let parentFile;
   if (parentId !== 0) {
   parentFile = await File.findById(parentId);
