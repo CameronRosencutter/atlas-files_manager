@@ -5,6 +5,65 @@ const fs = require('fs');
 const User = require('../models/User');
 const File = require('../models/File');
 
+const FilesController = {
+    getShow: async (req, res) => {
+      try {
+        // Retrieve the user based on the token
+        const user = await User.findOne({ token: req.token });
+  
+        // If user not found, return Unauthorized error
+        if (!user) {
+          return res.status(401).json({ error: 'Unauthorized' });
+        }
+  
+        // Find the file document based on the ID
+        const file = await File.findOne({ _id: req.params.id, user: user._id });
+  
+        // If file not found, return Not Found error
+        if (!file) {
+          return res.status(404).json({ error: 'Not found' });
+        }
+  
+        // Return the file document
+        return res.json(file);
+      } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: 'Internal Server Error' });
+      }
+    },
+  
+    getIndex: async (req, res) => {
+      try {
+        // Retrieve the user based on the token
+        const user = await User.findOne({ token: req.token });
+  
+        // If user not found, return Unauthorized error
+        if (!user) {
+          return res.status(401).json({ error: 'Unauthorized' });
+        }
+  
+        // Parse query parameters
+        const parentId = req.query.parentId || 0;
+        const page = parseInt(req.query.page) || 0;
+        const limit = 20;
+        const skip = page * limit;
+  
+        // Find all file documents for the user with pagination
+        const files = await File.find({ user: user._id, parentId: parentId })
+                                .skip(skip)
+                                .limit(limit);
+  
+        // Return the list of file documents
+        return res.json(files);
+      } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: 'Internal Server Error' });
+      }
+    }
+  };
+  
+  module.exports = FilesController;
+
 // POST /files
 const createFile = async (req, res) => {
   // Check for validation errors
