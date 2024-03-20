@@ -10,7 +10,7 @@ class UsersController {
     if (!email) {
       return res.status(400).json({ error: 'Missing email' });
     }
-    
+
     // Check if password is missing
     if (!password) {
       return res.status(400).json({ error: 'Missing password' });
@@ -22,7 +22,7 @@ class UsersController {
       if (userExists) {
         return res.status(400).json({ error: 'Already exist' });
       }
-  
+
       // Hash the password using SHA1
       const hashedPassword = sha1(password);
 
@@ -36,7 +36,7 @@ class UsersController {
       const savedUser = await dbClient.createUser(newUser);
 
       // Return the new user with only the email and the id
-      return res.status(201).json({ email: savedUser.email, id: savedUser._id });
+      return res.status(201).json({ id: savedUser.insertedId, email: savedUser.email });
     } catch (error) {
       console.error('Error creating user:', error);
       return res.status(500).json({ error: 'Internal Server Error' });
