@@ -9,17 +9,17 @@ const File = require('../models/File');
 const createFile = async (req, res) => {
   // Check for validation errors
   const errors = validationResult(req);
-    if (!errors.isEmpty()) {
+  if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
 
   // Retrieve user based on token
   const user = await User.findById(req.user.id);
   if (!user) {
-        return res.status(401).json({ message: 'Unauthorized' });
-    }
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
 
-    const { name, type, parentId = 0, isPublic = false, data } = req.body;
+  const { name, type, parentId = 0, isPublic = false, data } = req.body;
 
   // Validate required fields
   if (!name) {
@@ -27,20 +27,20 @@ const createFile = async (req, res) => {
   }
 
   if (!type || !['folder', 'file', 'image'].includes(type)) {
-        return res.status(400).json({ message: 'Missing or invalid type' });
-    }
+    return res.status(400).json({ message: 'Missing or invalid type' });
+  }
 
-    if ((type === 'file' || type === 'image') && !data) {
-        return res.status(400).json({ message: 'Missing data' });
-    }
+  if ((type === 'file' || type === 'image') && !data) {
+    return res.status(400).json({ message: 'Missing data' });
+  }
 
-    let parentFile;
-    if (parentId !== 0) {
-        parentFile = await File.findById(parentId);
-        if (!parentFile) {
-            return res.status(400).json({ message: 'Parent not found' });
-        }
-        if (parentFile.type !== 'folder') {
+  let parentFile;
+  if (parentId !== 0) {
+    parentFile = await File.findById(parentId);
+    if (!parentFile) {
+        return res.status(400).json({ message: 'Parent not found' });
+    }
+    if (parentFile.type !== 'folder') {
             return res.status(400).json({ message: 'Parent is not a folder' });
         }
     }
