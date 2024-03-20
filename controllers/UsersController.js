@@ -29,7 +29,7 @@ class UsersController {
       // Create the new user
       const newUser = {
         email,
-        password: hashedPassword,
+        password: hashedPassword
       };
 
       // Save the new user in the collection users
@@ -42,21 +42,21 @@ class UsersController {
       return res.status(500).json({ error: 'Internal Server Error' });
     }
   }
-//
-// static async getMe(req, res) {
-//   const token = req.headers['x-token'];
-//   const userId = await redisClient.get(`auth_${token}`);
-//   if (!userId) {
-//     return res.status(401).json({ error: 'Unauthorized' });
-//   }
+  //
+  // static async getMe(req, res) {
+  //   const token = req.headers['x-token'];
+  //   const userId = await redisClient.get(`auth_${token}`);
+  //   if (!userId) {
+  //     return res.status(401).json({ error: 'Unauthorized' });
+  //   }
 
-//   const user = await dbClient.users.findOne({ id: userId });
-//   if (!user) {
-//     return res.status(401).json({ error: 'Unauthorized' });
-//   }
+  //   const user = await dbClient.users.findOne({ id: userId });
+  //   if (!user) {
+  //     return res.status(401).json({ error: 'Unauthorized' });
+  //   }
 
-//   return res.status(200).json({ email: user.email, id: user._id });
-// }
+  //   return res.status(200).json({ email: user.email, id: user._id });
+  // }
 }
 
 module.exports = UsersController;
