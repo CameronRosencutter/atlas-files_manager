@@ -33,10 +33,10 @@ class UsersController {
       };
 
       // Save the new user in the collection users
-      const savedUser = await dbClient.createUser(newUser);
+      const savedUser = await dbClient.users.insertOne(newUser);
 
       // Return the new user with only the email and the id
-      return res.status(201).json({ id: savedUser.insertedId, email: savedUser.email });
+      return res.status(201).json({ id: savedUser.insertedId, email });
     } catch (error) {
       console.error('Error creating user:', error);
       return res.status(500).json({ error: 'Internal Server Error' });
@@ -50,7 +50,7 @@ class UsersController {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    const user = await dbClient.getUserById(userId);
+    const user = await dbClient.users.findOne({ id: userId });
     if (!user) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
