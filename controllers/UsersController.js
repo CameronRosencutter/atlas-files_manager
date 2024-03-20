@@ -26,14 +26,8 @@ class UsersController {
       // Hash the password using SHA1
       const hashedPassword = sha1(password);
 
-      // Create the new user
-      const newUser = {
-        email,
-        password: hashedPassword
-      };
-
       // Save the new user in the collection users
-      const savedUser = await dbClient.users.insertOne(newUser);
+      const savedUser = await dbClient.users.insertOne({ email, password: hashedPassword });
 
       // Return the new user with only the email and the id
       return res.status(201).json({ id: savedUser.insertedId, email });
