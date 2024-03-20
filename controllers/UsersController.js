@@ -3,12 +3,12 @@ const redisClient = require('../utils/redis');
 const dbClient = require('../utils/db');
 
 class UsersController {
-    static async postNew(req, res) {
-      const { email, password } = req.body;
-  
-      // Check if email is missing
-      if (!email) {
-        return res.status(400).json({ error: 'Missing email' });
+  static async postNew(req, res) {
+    const { email, password } = req.body;
+
+    // Check if email is missing
+    if (!email) {
+      return res.status(400).json({ error: 'Missing email' });
       }
   
       // Check if password is missing
