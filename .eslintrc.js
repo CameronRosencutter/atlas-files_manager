@@ -27,6 +27,16 @@ module.exports = {
         'LabeledStatement',
         'WithStatement',
       ],
+      // to deal with the eslint checker error
+      'import/no-extraneous-dependencies': ['error', {
+        devDependencies: true,
+        optionalDependencies: false,
+        peerDependencies: false,
+        packageDir: './',
+        // Add body-parser to the list of core modules
+        'import/core-modules': ['body-parser'],
+      }],
+      // I really hope it works
     },
     overrides:[
       {
