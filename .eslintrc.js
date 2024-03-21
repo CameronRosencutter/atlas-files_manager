@@ -27,15 +27,14 @@ module.exports = {
         'LabeledStatement',
         'WithStatement',
       ],
-      // to deal with the eslint checker error
-      'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
-      'import/core-modules': ['body-parser'],
-      // I really hope it works
     },
     overrides:[
       {
         files: ['*.js'],
         excludedFiles: 'babel.config.js',
       }
-    ]
+    ],
+    settings: {
+      'import/core-modules': ['body-parser'],
+    },
 };
