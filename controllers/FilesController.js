@@ -6,68 +6,68 @@ const User = require('../models/User');
 const File = require('../models/File');
 
 const FilesController = {
-    putPublish: async (req, res) => {
-      try {
-        // Retrieve the user based on the token
-        const user = await User.findOne({ token: req.token });
-  
-        // If user not found, return Unauthorized error
-        if (!user) {
-          return res.status(401).json({ error: 'Unauthorized' });
-        }
-  
-        // Find the file document based on the ID
-        const file = await File.findOne({ _id: req.params.id, user: user._id });
-  
-        // If file not found, return Not Found error
-        if (!file) {
-          return res.status(404).json({ error: 'Not found' });
-        }
-  
-        // Update isPublic to true
-        file.isPublic = true;
-        await file.save();
-  
-        // Return the updated file document
-        return res.status(200).json(file);
-      } catch (error) {
-        console.error(error);
-        return res.status(500).json({ error: 'Internal Server Error' });
+  putPublish: async (req, res) => {
+    try {
+      // Retrieve the user based on the token
+      const user = await User.findOne({ token: req.token });
+
+      // If user not found, return Unauthorized error
+      if (!user) {
+        return res.status(401).json({ error: 'Unauthorized' });
       }
-    },
-  
-    putUnpublish: async (req, res) => {
-      try {
-        // Retrieve the user based on the token
-        const user = await User.findOne({ token: req.token });
-  
-        // If user not found, return Unauthorized error
-        if (!user) {
-          return res.status(401).json({ error: 'Unauthorized' });
-        }
-  
-        // Find the file document based on the ID
-        const file = await File.findOne({ _id: req.params.id, user: user._id });
-  
-        // If file not found, return Not Found error
-        if (!file) {
-          return res.status(404).json({ error: 'Not found' });
-        }
-  
-        // Update isPublic to false
-        file.isPublic = false;
-        await file.save();
-  
-        // Return the updated file document
-        return res.status(200).json(file);
-      } catch (error) {
-        console.error(error);
-        return res.status(500).json({ error: 'Internal Server Error' });
+
+      // Find the file document based on the ID
+      const file = await File.findOne({ _id: req.params.id, user: user._id });
+
+      // If file not found, return Not Found error
+      if (!file) {
+        return res.status(404).json({ error: 'Not found' });
       }
+
+      // Update isPublic to true
+      file.isPublic = true;
+      await file.save();
+
+      // Return the updated file document
+      return res.status(200).json(file);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'Internal Server Error' });
     }
-  };
-  
-  module.exports = FilesController;
+  },
+
+  putUnpublish: async (req, res) => {
+    try {
+      // Retrieve the user based on the token
+      const user = await User.findOne({ token: req.token });
+
+      // If user not found, return Unauthorized error
+      if (!user) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      // Find the file document based on the ID
+      const file = await File.findOne({ _id: req.params.id, user: user._id });
+
+      // If file not found, return Not Found error
+      if (!file) {
+        return res.status(404).json({ error: 'Not found' });
+      }
+
+      // Update isPublic to false
+      file.isPublic = false;
+      await file.save();
+
+      // Return the updated file document
+      return res.status(200).json(file);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+  }
+};
+
+module.exports = FilesController;
 
 // POST /files
 const createFile = async (req, res) => {
@@ -102,10 +102,10 @@ const createFile = async (req, res) => {
   if (parentId !== 0) {
     parentFile = await File.findById(parentId);
     if (!parentFile) {
-        return res.status(400).json({ message: 'Parent not found' });
+      return res.status(400).json({ message: 'Parent not found' });
     }
     if (parentFile.type !== 'folder') {
-        return res.status(400).json({ message: 'Parent is not a folder' });
+      return res.status(400).json({ message: 'Parent is not a folder' });
     }
   }
 
@@ -122,15 +122,15 @@ const createFile = async (req, res) => {
   }
 
   const newFile = new File({
-        userId: user._id,
-        name,
-        type,
-        parentId,
-        isPublic,
-        localPath: localPath || null,
-    });
+    userId: user._id,
+    name,
+    type,
+    parentId,
+    isPublic,
+    localPath: localPath || null,
+  });
 
-    await newFile.save();
+  await newFile.save();
 
-    return res.status(201).json(newFile);
+  return res.status(201).json(newFile);
 }
