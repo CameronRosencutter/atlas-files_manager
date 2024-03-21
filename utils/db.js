@@ -8,6 +8,7 @@ class DBClient {
     this.client = new MongoClient(`mongodb://${this.host}:${this.port}/${this.database}`, { useUnifiedTopology: true });
     this.client.connect();
     this.users = this.client.db(this.database).collection('users');
+    this.files = this.client.db(this.database).collection('files');
   }
 
   isAlive() {
@@ -15,12 +16,12 @@ class DBClient {
   }
 
   async nbUsers() {
-    const users = this.client.db(this.database).collection('users');
+    const users = this.client.db().collection('users');
     return users.countDocuments();
   }
 
   async nbFiles() {
-    const files = this.client.db(this.database).collection('files');
+    const files = this.client.db().collection('files');
     return files.countDocuments();
   }
 }

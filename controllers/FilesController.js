@@ -2,14 +2,13 @@ const { validationResult } = require('express-validator');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 const fs = require('fs');
-const User = require('../models/User');
-const File = require('../models/File');
+const dbClient = require('../utils/db');
 
 const FilesController = {
   putPublish: async (req, res) => {
     try {
       // Retrieve the user based on the token
-      const user = await User.findOne({ token: req.token });
+      const user = await dbClient.users.findOne({ token: req.token });
 
       // If user not found, return Unauthorized error
       if (!user) {
@@ -17,7 +16,7 @@ const FilesController = {
       }
 
       // Find the file document based on the ID
-      const file = await File.findOne({ _id: req.params.id, user: user._id });
+      const file = await dbClient.files.findOne({ _id: req.params.id, user: user._id });
 
       // If file not found, return Not Found error
       if (!file) {
@@ -39,7 +38,7 @@ const FilesController = {
   putUnpublish: async (req, res) => {
     try {
       // Retrieve the user based on the token
-      const user = await User.findOne({ token: req.token });
+      const user = await dbClient.users.findOne({ token: req.token });
 
       // If user not found, return Unauthorized error
       if (!user) {
@@ -47,7 +46,7 @@ const FilesController = {
       }
 
       // Find the file document based on the ID
-      const file = await File.findOne({ _id: req.params.id, user: user._id });
+      const file = await dbClient.files.findOne({ _id: req.params.id, user: user._id });
 
       // If file not found, return Not Found error
       if (!file) {
@@ -78,7 +77,7 @@ const createFile = async (req, res) => {
   }
 
   // Retrieve user based on token
-  const user = await User.findById(req.user.id);
+  const user = await dbClient.users.findById(req.user.id);
   if (!user) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
@@ -100,7 +99,7 @@ const createFile = async (req, res) => {
 
   let parentFile;
   if (parentId !== 0) {
-    parentFile = await File.findById(parentId);
+    parentFile = await dbClient.files.findById(parentId);
     if (!parentFile) {
       return res.status(400).json({ message: 'Parent not found' });
     }
@@ -121,14 +120,14 @@ const createFile = async (req, res) => {
     fs.writeFileSync(localPath, buffer);
   }
 
-  const newFile = new File({
+  const newFile = {
     userId: user._id,
     name,
     type,
     parentId,
     isPublic,
     localPath: localPath || null,
-  });
+  };
 
   await newFile.save();
 
