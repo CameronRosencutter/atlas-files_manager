@@ -34,7 +34,4 @@ module.exports = {
         excludedFiles: 'babel.config.js',
       }
     ],
-    settings: {
-      'import/core-modules': ['body-parser'],
-    },
 };
