@@ -1,4 +1,6 @@
 /* eslint-disable linebreak-style */
+/* eslint-disable comma-dangle */
+/* eslint-disable linebreak-style */
 /* eslint-disable consistent-return */
 /* eslint-disable linebreak-style */
 import redis from 'redis';
@@ -6,9 +8,8 @@ import redis from 'redis';
 class RedisClient {
   constructor() {
     this.client = redis.createClient({
-      host: '127.0.0.1', // Default is '127.0.0.1'
-      // eslint-disable-next-line comma-dangle
-      port: 6379 // Default is 6379
+      host: 'localhost', // Use the container name
+      port: 6379
     });
 
     this.client.on('error', (err) => {

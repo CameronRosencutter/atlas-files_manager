@@ -4,7 +4,8 @@
 /* eslint-disable linebreak-style */
 import dbClient from '../utils/db';
 import sha1 from 'sha1';
-import { ObjectId } from 'mongodb'; // Ensure this import is correct
+import { ObjectId } from 'mongodb';
+import redisClient from '../utils/redis';
 
 class UsersController {
   static async postNew(req, res) {
@@ -40,13 +41,14 @@ class UsersController {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    const userId = await redisClient.get(`auth_${token}`);
+    const key = `auth_${token}`;
+    const userId = await redisClient.get(key);
 
     if (!userId) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    const user = await dbClient.db.collection('users').findOne({ _id: new ObjectId(userId) });
+    const user = await dbClient.db.collection('users').findOne({ _id: ObjectId(userId) });
 
     if (!user) {
       return res.status(401).json({ error: 'Unauthorized' });
