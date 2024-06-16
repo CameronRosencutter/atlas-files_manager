@@ -8,7 +8,7 @@ import redis from 'redis';
 class RedisClient {
   constructor() {
     this.client = redis.createClient({
-      host: 'localhost', // Use the container name
+      host: '172.17.0.2', // Use the IP address of the Redis container
       port: 6379
     });
 
