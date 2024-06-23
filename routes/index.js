@@ -7,19 +7,14 @@
 /* eslint-disable import/no-unresolved */
 /* eslint-disable linebreak-style */
 // eslint-disable-next-line import/extensions
+import { Router } from 'express';
+import AuthController from '../controllers/AuthController';
+import UsersController from '../controllers/UsersController';
 
-import express from 'express';
-import AppController from '../controllers/AppController';
-import AuthController from '../controllers/AuthController';  // Import AuthController
-import UsersController from '../controllers/UsersController'; // Import UsersController
+const router = Router();
 
-const router = express.Router();
-
-router.get('/status', AppController.getStatus);
-router.get('/stats', AppController.getStats);
-router.post('/users', UsersController.postNew);
-router.get('/connect', AuthController.getConnect);  // Add connect endpoint
-router.get('/disconnect', AuthController.getDisconnect);  // Add disconnect endpoint
-router.get('/users/me', UsersController.getMe);  // Add getMe endpoint
+router.get('/connect', AuthController.getConnect);
+router.get('/disconnect', AuthController.getDisconnect);
+router.get('/users/me', UsersController.getMe);
 
 export default router;

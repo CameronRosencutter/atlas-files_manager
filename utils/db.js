@@ -1,24 +1,26 @@
 /* eslint-disable linebreak-style */
 /* eslint-disable no-unused-vars */
 /* eslint-disable linebreak-style */
-import { MongoClient } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb';
 
 class DBClient {
   constructor() {
     const host = process.env.DB_HOST || 'localhost';
     const port = process.env.DB_PORT || 27017;
     const database = process.env.DB_DATABASE || 'files_manager';
-    const url = `mongodb://${host}:${port}`;
+    this.client = new MongoClient(`mongodb://${host}:${port}/${database}`, { useUnifiedTopology: true });
+    this.client.connect().then(() => {
+      this.db = this.client.db(database);
+      this.users = this.db.collection('users');
+    });
+  }
 
-    this.client = new MongoClient(url, { useUnifiedTopology: true });
-    this.client.connect()
-      .then(() => {
-        this.db = this.client.db(database);
-        console.log('Connected to MongoDB');
-      })
-      .catch((err) => {
-        console.error('MongoDB connection error:', err);
-      });
+  async getUser(query) {
+    return this.users.findOne(query);
+  }
+
+  async getUserById(id) {
+    return this.users.findOne({ _id: ObjectId(id) });
   }
 
   isAlive() {
@@ -26,11 +28,7 @@ class DBClient {
   }
 
   async nbUsers() {
-    return this.db.collection('users').countDocuments();
-  }
-
-  async nbFiles() {
-    return this.db.collection('files').countDocuments();
+    return this.users.countDocuments();
   }
 }
 
