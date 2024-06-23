@@ -12,6 +12,7 @@ class DBClient {
     this.client.connect().then(() => {
       this.db = this.client.db(database);
       this.users = this.db.collection('users');
+      this.files = this.db.collection('files');
     });
   }
 
@@ -21,6 +22,15 @@ class DBClient {
 
   async getUserById(id) {
     return this.users.findOne({ _id: ObjectId(id) });
+  }
+
+  async getFileById(id) {
+    return this.files.findOne({ _id: ObjectId(id) });
+  }
+
+  async addFile(fileDocument) {
+    const result = await this.files.insertOne(fileDocument);
+    return { ...fileDocument, _id: result.insertedId };
   }
 
   isAlive() {

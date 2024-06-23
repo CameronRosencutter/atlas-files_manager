@@ -10,11 +10,13 @@
 import { Router } from 'express';
 import AuthController from '../controllers/AuthController';
 import UsersController from '../controllers/UsersController';
+import FilesController from '../controllers/FilesController'; // Import the new controller
 
 const router = Router();
 
 router.get('/connect', AuthController.getConnect);
 router.get('/disconnect', AuthController.getDisconnect);
 router.get('/users/me', UsersController.getMe);
+router.post('/files', FilesController.postUpload); // Add the new endpoint
 
 export default router;
