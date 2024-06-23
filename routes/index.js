@@ -17,6 +17,8 @@ const router = Router();
 router.get('/connect', AuthController.getConnect);
 router.get('/disconnect', AuthController.getDisconnect);
 router.get('/users/me', UsersController.getMe);
-router.post('/files', FilesController.postUpload); // Add the new endpoint
+router.post('/files', FilesController.postUpload);
+router.get('/files/:id', FilesController.getShow); // Add endpoint for retrieving file by ID
+router.get('/files', FilesController.getIndex); // Add endpoint for retrieving all files with pagination
 
 export default router;

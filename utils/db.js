@@ -28,6 +28,10 @@ class DBClient {
     return this.files.findOne({ _id: ObjectId(id) });
   }
 
+  async getFilesByUserIdAndParentId(userId, parentId, skip, limit) {
+    return this.files.find({ userId, parentId }).skip(skip).limit(limit).toArray();
+  }
+
   async addFile(fileDocument) {
     const result = await this.files.insertOne(fileDocument);
     return { ...fileDocument, _id: result.insertedId };
