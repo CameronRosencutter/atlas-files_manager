@@ -10,7 +10,7 @@ class DBClient {
       this.db = this.client.db(database);
       this.users = this.db.collection('users');
       this.files = this.db.collection('files');
-    }).catch((err) => { 
+    }).catch((err) => {
       console.error('Failed to connect to MongoDB', err);
     });
   }

@@ -11,6 +11,7 @@ const express = require('express');
 const AuthController = require('../controllers/AuthController');
 const UsersController = require('../controllers/UsersController');
 const FilesController = require('../controllers/FilesController');
+const AppController = require('../controllers/AppController');
 
 const router = express.Router();
 
@@ -22,5 +23,9 @@ router.get('/files/:id', FilesController.getShow);
 router.get('/files', FilesController.getIndex);
 router.put('/files/:id/publish', FilesController.putPublish);
 router.put('/files/:id/unpublish', FilesController.putUnpublish);
+
+// New routes for status and stats
+router.get('/status', AppController.getStatus);
+router.get('/stats', AppController.getStats);
 
 module.exports = router;
