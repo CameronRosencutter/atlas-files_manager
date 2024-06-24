@@ -2,29 +2,28 @@
 /* eslint-disable import/order */
 /* eslint-disable no-undef */
 /* eslint-disable linebreak-style */
-import redisClient from '../utils/redis';
-import dbClient from '../utils/db';
+const redisClient = require('../utils/redis');
+const User = require('../models/User');
 
 class UsersController {
   static async getMe(req, res) {
-    const token = req.header('X-Token');
+    const token = req.headers['x-token'];
     if (!token) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    const key = `auth_${token}`;
-    const userId = await redisClient.get(key);
+    const userId = await redisClient.get(`auth_${token}`);
     if (!userId) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    const user = await dbClient.getUserById(userId);
+    const user = await User.findById(userId).select('email _id');
     if (!user) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    return res.status(200).json({ id: user._id.toString(), email: user.email });
+    return res.status(200).json({ id: user._id, email: user.email });
   }
 }
 
-export default UsersController;
+module.exports = UsersController;

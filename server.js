@@ -1,16 +1,33 @@
 /* eslint-disable linebreak-style */
+/* eslint-disable arrow-parens */
+/* eslint-disable linebreak-style */
+/* eslint-disable import/no-extraneous-dependencies */
+/* eslint-disable linebreak-style */
 /* eslint-disable import/no-unresolved */
 /* eslint-disable import/extensions */
 /* eslint-disable linebreak-style */
-import express from 'express';
-import routes from './routes/index';
+const express = require('express');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const dotenv = require('dotenv');
+const routes = require('./routes/index');
+
+dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const port = process.env.PORT || 5000;
 
-app.use(express.json());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.log(err));
+
 app.use('/', routes);
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 });
+
+module.exports = app;
