@@ -8,6 +8,7 @@
 /* eslint-disable linebreak-style */
 // eslint-disable-next-line import/extensions
 const express = require('express');
+router.post('/users', UsersController.postNew);
 const AuthController = require('../controllers/AuthController');
 const UsersController = require('../controllers/UsersController');
 const FilesController = require('../controllers/FilesController');
