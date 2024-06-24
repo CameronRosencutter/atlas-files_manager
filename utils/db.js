@@ -1,7 +1,7 @@
 /* eslint-disable linebreak-style */
 /* eslint-disable no-unused-vars */
 /* eslint-disable linebreak-style */
-import { MongoClient, ObjectId } from 'mongodb';
+const { MongoClient, ObjectId } = require('mongodb');
 
 class DBClient {
   constructor() {
@@ -13,43 +13,25 @@ class DBClient {
       this.db = this.client.db(database);
       this.users = this.db.collection('users');
       this.files = this.db.collection('files');
+    }).catch(err => {
+      console.error('Failed to connect to MongoDB', err);
     });
   }
 
-  async getUser(query) {
-    return this.users.findOne(query);
-  }
-
-  async getUserById(id) {
-    return this.users.findOne({ _id: ObjectId(id) });
-  }
-
-  async getFileById(id) {
-    return this.files.findOne({ _id: ObjectId(id) });
-  }
-
-  async getFilesByUserIdAndParentId(userId, parentId, skip, limit) {
-    return this.files.find({ userId, parentId }).skip(skip).limit(limit).toArray();
-  }
-
-  async addFile(fileDocument) {
-    const result = await this.files.insertOne(fileDocument);
-    return { ...fileDocument, _id: result.insertedId };
-  }
-
-  async updateFile(id, update) {
-    const result = await this.files.updateOne({ _id: ObjectId(id) }, { $set: update });
-    return result.modifiedCount > 0;
-  }
-
   isAlive() {
-    return this.client.isConnected();
+    return this.client && this.client.isConnected();
   }
 
   async nbUsers() {
+    if (!this.users) return 0;
     return this.users.countDocuments();
+  }
+
+  async nbFiles() {
+    if (!this.files) return 0;
+    return this.files.countDocuments();
   }
 }
 
 const dbClient = new DBClient();
-export default dbClient;
+module.exports = dbClient;

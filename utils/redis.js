@@ -3,7 +3,7 @@
 /* eslint-disable linebreak-style */
 /* eslint-disable consistent-return */
 /* eslint-disable linebreak-style */
-import redis from 'redis';
+const redis = require('redis');
 
 class RedisClient {
   constructor() {
@@ -50,4 +50,4 @@ class RedisClient {
 }
 
 const redisClient = new RedisClient();
-export default redisClient;
+module.exports = redisClient;
