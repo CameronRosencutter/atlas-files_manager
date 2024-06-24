@@ -18,7 +18,9 @@ router.get('/connect', AuthController.getConnect);
 router.get('/disconnect', AuthController.getDisconnect);
 router.get('/users/me', UsersController.getMe);
 router.post('/files', FilesController.postUpload);
-router.get('/files/:id', FilesController.getShow); // Add endpoint for retrieving file by ID
-router.get('/files', FilesController.getIndex); // Add endpoint for retrieving all files with pagination
+router.get('/files/:id', FilesController.getShow);
+router.get('/files', FilesController.getIndex);
+router.put('/files/:id/publish', FilesController.putPublish); // Add endpoint for publishing file
+router.put('/files/:id/unpublish', FilesController.putUnpublish); // Add endpoint for unpublishing file
 
 export default router;

@@ -37,6 +37,11 @@ class DBClient {
     return { ...fileDocument, _id: result.insertedId };
   }
 
+  async updateFile(id, update) {
+    const result = await this.files.updateOne({ _id: ObjectId(id) }, { $set: update });
+    return result.modifiedCount > 0;
+  }
+
   isAlive() {
     return this.client.isConnected();
   }
