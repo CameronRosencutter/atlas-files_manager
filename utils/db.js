@@ -1,6 +1,3 @@
-/* eslint-disable linebreak-style */
-/* eslint-disable no-unused-vars */
-/* eslint-disable linebreak-style */
 const { MongoClient, ObjectId } = require('mongodb');
 
 class DBClient {
@@ -8,12 +5,12 @@ class DBClient {
     const host = process.env.DB_HOST || 'localhost';
     const port = process.env.DB_PORT || 27017;
     const database = process.env.DB_DATABASE || 'files_manager';
-    this.client = new MongoClient(`mongodb://${host}:${port}/${database}`, { useUnifiedTopology: true });
+    this.client = new MongoClient(`mongodb://${host}:${port}`, { useUnifiedTopology: true });
     this.client.connect().then(() => {
       this.db = this.client.db(database);
       this.users = this.db.collection('users');
       this.files = this.db.collection('files');
-    }).catch(err => {
+    }).catch((err) => { 
       console.error('Failed to connect to MongoDB', err);
     });
   }
