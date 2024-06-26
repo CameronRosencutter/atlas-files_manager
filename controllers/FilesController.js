@@ -1,40 +1,48 @@
-// controllers/FilesController.js
-
+const { ObjectId } = require('mongodb');
+const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 const path = require('path');
-const uuid = require('uuid');
-const { validationResult } = require('express-validator');
-const { File } = require('../models/File'); // Assuming you have a File model
+const redisClient = require('../utils/redis');
+const dbClient = require('../utils/db');
 
-// POST /files controller method
-exports.postUpload = async (req, res) => {
-  // Validate incoming data
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
+class FilesController {
+  static async postUpload(req, res) {
+    const userToken = req.headers['x-token'];
+    const {
+      name,
+      type,
+      data,
+      parentId = '0',
+      isPublic = false,
+    } = req.body;
 
-  try {
-    // Retrieve user ID from authentication token (assuming it's decoded and available in req.user)
-    const userId = req.user.id; // Adjust this based on your authentication setup
+    // Validate user token
+    const userId = await redisClient.get(`auth_${userToken}`);
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
 
-    // Extract file data from request body
-    const { name, type, parentId, isPublic, data } = req.body;
-
-    // Validate required fields
+    // Validate request body
     if (!name) {
       return res.status(400).json({ error: 'Missing name' });
     }
-    if (!type || !['folder', 'file', 'image'].includes(type)) {
-      return res.status(400).json({ error: 'Missing type or invalid type' });
+    if (!type) {
+      return res.status(400).json({ error: 'Missing type' });
     }
-    if ((type === 'file' || type === 'image') && !data) {
+    const validTypes = ['folder', 'file', 'image'];
+    if (!validTypes.includes(type)) {
+      return res.status(400).json({ error: 'Invalid type' });
+    }
+    if (type !== 'folder' && !data) {
       return res.status(400).json({ error: 'Missing data' });
     }
 
-    // Handle parentId validation
-    if (parentId) {
-      const parentFile = await File.findById(parentId);
+    // Validate parentId if provided
+    if (parentId !== '0') {
+      if (!ObjectId.isValid(parentId)) {
+        return res.status(400).json({ error: 'Invalid parentId' });
+      }
+      const parentFile = await dbClient.files.findOne({ _id: ObjectId(parentId) });
       if (!parentFile) {
         return res.status(400).json({ error: 'Parent not found' });
       }
@@ -43,36 +51,52 @@ exports.postUpload = async (req, res) => {
       }
     }
 
-    // Prepare file document to save in DB
-    const fileData = {
-      userId,
-      name,
-      type,
-      isPublic: isPublic || false,
-      parentId: parentId || 0,
-    };
+    // Additional checks based on file type and parentId
+    try {
+      if (type === 'folder') {
+        if (parentId !== '0') {
+          return res.status(400).json({ error: 'Cannot create a folder inside another folder' });
+        }
+      } else if (type !== 'folder' && parentId === '0') {
+        return res.status(400).json({ error: 'Cannot create a file at the root' });
+      }
 
-    // Handle file data storage
-    if (type === 'file' || type === 'image') {
-      // Determine storage folder path
-      const folderPath = process.env.FOLDER_PATH || '/tmp/files_manager';
-      const filePath = path.join(folderPath, uuid.v4());
+      // Handle file upload for 'file' and 'image' types
+      let localPath;
+      if (type === 'file' || type === 'image') {
+        const folderPath = process.env.FOLDER_PATH || '/tmp/files_manager';
+        localPath = path.join(folderPath, `${uuidv4()}`);
+        const fileContent = Buffer.from(data, 'base64');
+        fs.writeFileSync(localPath, fileContent);
+      }
 
-      // Decode and write file content to disk
-      const fileBuffer = Buffer.from(data, 'base64');
-      fs.writeFileSync(filePath, fileBuffer);
+      // Prepare new file object for database insertion
+      const newFile = {
+        userId: ObjectId(userId),
+        name,
+        type,
+        isPublic,
+        parentId: ObjectId(parentId),
+        localPath: localPath || null,
+      };
 
-      // Add localPath to fileData for database entry
-      fileData.localPath = filePath;
+      // Insert new file into the database
+      const result = await dbClient.files.insertOne(newFile);
+
+      // Respond with success status and inserted file details
+      return res.status(201).json({
+        id: result.insertedId,
+        userId,
+        name,
+        type,
+        isPublic,
+        parentId,
+      });
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      return res.status(500).json({ error: 'Internal Server Error' });
     }
-
-    // Create new file document in DB
-    const newFile = await File.create(fileData);
-
-    // Return success response with created file details
-    res.status(201).json(newFile);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ error: 'Server error' });
   }
-};
+}
+
+module.exports = FilesController;
