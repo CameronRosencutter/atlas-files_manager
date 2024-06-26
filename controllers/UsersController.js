@@ -2,48 +2,27 @@
 /* eslint-disable import/order */
 /* eslint-disable no-undef */
 /* eslint-disable linebreak-style */
-/* eslint-disable linebreak-style */
-/* eslint-disable linebreak-style */
-const sha1 = require('sha1');
-const dbClient = require('../utils/db');
+const redisClient = require('../utils/redis');
+const User = require('../models/User');
 
 class UsersController {
-  static async postNew(req, res) {
-    const { email, password } = req.body;
-
-    // Check if email and password are provided
-    if (!email) {
-      return res.status(400).json({ error: 'Missing email' });
-    }
-    if (!password) {
-      return res.status(400).json({ error: 'Missing password' });
+  static async getMe(req, res) {
+    const token = req.headers['x-token'];
+    if (!token) {
+      return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    try {
-      // Check if email already exists
-      const existingUser = await dbClient.getUser({ email });
-      if (existingUser) {
-        return res.status(400).json({ error: 'Already exist' });
-      }
-
-      // Hash the password
-      const hashedPassword = sha1(password);
-
-      // Create the new user
-      const newUser = {
-        email,
-        password: hashedPassword,
-      };
-
-      // Save the new user to the database
-      const result = await dbClient.users.insertOne(newUser);
-
-      // Respond with the new user's id and email
-      res.status(201).json({ id: result.insertedId, email });
-    } catch (error) {
-      console.error('Error creating user:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
+    const userId = await redisClient.get(`auth_${token}`);
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
     }
+
+    const user = await User.findById(userId).select('email _id');
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    return res.status(200).json({ id: user._id, email: user.email });
   }
 }
 
